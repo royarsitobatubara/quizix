@@ -58,6 +58,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/profile/
+    - assets/images/lesson/
     - assets/langs/
     - assets/sounds/
 

@@ -4,8 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:quizix/data/database/db_helper.dart';
 import 'package:quizix/data/question/biology.dart';
+import 'package:quizix/data/question/chemistry.dart';
+import 'package:quizix/data/question/history.dart';
 import 'package:quizix/data/question/informatics.dart';
 import 'package:quizix/data/question/physics.dart';
+import 'package:quizix/data/question/mathematics.dart';
+import 'package:quizix/data/question/science.dart';
 import 'package:quizix/data/user_provider.dart';
 import 'package:quizix/data/user_storage.dart';
 import 'package:quizix/models/question_model.dart';
@@ -17,7 +21,11 @@ List<QuestionModel> getQuestion(String category, String level) {
   final categoryMap = {
     "informatics": informaticsQuestion,
     "biology": biologyQuestion,
-    "physics": physicsQuestion
+    "physics": physicsQuestion,
+    "mathematics": mathematicsQuestion,
+    "chemistry": chemistryQuestion,
+    "history": historyQuestion,
+    "science": scienceQuestion
   };
   final selectedCategory = categoryMap[category];
   if (selectedCategory == null) return [];

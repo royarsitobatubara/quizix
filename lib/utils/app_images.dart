@@ -13,9 +13,13 @@ class AppImages {
   static final String guestNumber = '$_baseUrl/guest_number.webp';
 
   // LOGO LESSON
-  static final String informatics = '$_baseUrl/informatics.webp';
-  static final String biology = '$_baseUrl/biology.webp';
-  static final String physics = '$_baseUrl/physics.webp';
+  static final String informatics = '$_baseUrl/lesson/informatics.webp';
+  static final String biology = '$_baseUrl/lesson/biology.webp';
+  static final String physics = '$_baseUrl/lesson/physics.webp';
+  static final String chemistry = '$_baseUrl/lesson/chemistry.webp';
+  static final String history= '$_baseUrl/lesson/history.webp';
+  static final String mathematics = '$_baseUrl/lesson/mathematics.webp';
+  static final String science = '$_baseUrl/lesson/science.webp';
 
   // PROFILE
   static final String profile1 = '$_baseUrl/profile/1.webp';
