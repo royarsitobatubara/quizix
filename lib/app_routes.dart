@@ -40,7 +40,8 @@ class AppRoutes {
             final correct = data['correct'];
             final wrong = data['wrong'];
             final score = data['score'];
-            return ResultScreen(correct: correct, wrong: wrong, score: score);
+            final skip = data['skip'];
+            return ResultScreen(correct: correct, wrong: wrong, score: score,skip: skip,);
           },
         ),
 

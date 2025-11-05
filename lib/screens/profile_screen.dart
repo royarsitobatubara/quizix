@@ -5,17 +5,11 @@ import 'package:provider/provider.dart';
 import 'package:quizix/data/user_provider.dart';
 import 'package:quizix/screens/layout/layout_screen.dart';
 import 'package:quizix/utils/app_colors.dart';
-import 'package:quizix/utils/app_images.dart';
 import 'package:quizix/widgets/rank_label.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final userName = context.watch<UserProvider>().name;
@@ -42,12 +36,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.white.withValues(alpha: .5),
                       shape: BoxShape.circle,
                     ),
-                    child: Image.asset(AppImages.defaultProfile, width: 80, height: 80,),
+                    child: Selector<UserProvider, String>(builder: (_, value, _){
+                      return ClipOval(child: Image.asset(value, width: 80, height: 80,),);
+                    }, selector: (_, prov)=> prov.profile),
                   ),
                   TextButton(onPressed: ()=>context.push('/edit-photo'), child: Text("edit".tr(), style: TextStyle(
                     color: Colors.white,

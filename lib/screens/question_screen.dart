@@ -99,7 +99,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     }
 
     if (!mounted) return;
-    context.push('/result', extra: {
+    context.go('/result', extra: {
       'correct': correct,
       'wrong': wrong,
       'skip': skip,

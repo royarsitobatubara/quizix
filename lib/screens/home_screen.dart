@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:quizix/data/list_data.dart';
 import 'package:quizix/data/user_provider.dart';
-import 'package:quizix/utils/app_images.dart';
 import 'package:quizix/widgets/info_daily_task.dart';
 import 'package:quizix/widgets/game_item.dart';
 import 'package:quizix/widgets/question_item.dart';
@@ -25,11 +24,22 @@ class HomeScreen extends StatelessWidget {
           GestureDetector(
             onTap: ()=>context.push('/profile'),
             child: ListTile(
-              leading: CircleAvatar(
-                radius: 26,
-                backgroundColor: Colors.white,
-                child: Image.asset(AppImages.defaultProfile, width: 30, height: 30,),
-              ),
+              leading: Selector<UserProvider, String>(
+            selector: (_, prov)=> prov.profile,
+            builder: (_, value, __){
+              return ClipOval(
+                child: SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: Image.asset(
+                    value,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            },
+            ),
+
               title: Text(
                 userName,
                 style: const TextStyle(

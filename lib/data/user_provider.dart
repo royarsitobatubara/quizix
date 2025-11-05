@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:quizix/data/database/db_service.dart';
 import 'package:quizix/data/user_storage.dart';
 import 'package:quizix/models/history_model.dart';
+import 'package:quizix/utils/app_images.dart';
 
 class UserProvider extends ChangeNotifier {
   String _name = "Guest";
   int _point = 0;
   int _progressDaily = 0;
   bool _backSound = true;
+  String _profile = '';
   List<HistoryModel> _history = [];
 
   String get name => _name;
+  String get profile => _profile;
   int get point => _point;
   int get progressDaily => _progressDaily;
   bool get backSound => _backSound;
@@ -26,6 +29,7 @@ class UserProvider extends ChangeNotifier {
     loadBackSound();
     loadHistory();
     loadProgressDaily();
+    loadProfile();
   }
 
   Future<void> loadHistory() async {
@@ -111,4 +115,17 @@ class UserProvider extends ChangeNotifier {
     await UserStorage.setProgressDaily(newProgress);
     notifyListeners();
   }
+
+  Future<void> loadProfile() async {
+    final data = await UserStorage.getDataString(key: 'profile');
+
+    if (data.isEmpty || !data.contains('assets/images/')) {
+      _profile = AppImages.defaultProfile;
+    } else {
+      _profile = data;
+    }
+
+    notifyListeners();
+  }
+
 }
