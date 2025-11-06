@@ -3,12 +3,18 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:quizix/data/database/db_service.dart';
-import 'package:quizix/data/user_provider.dart';
+import 'package:quizix/data/database/detail_history_service.dart';
+import 'package:quizix/data/database/history_service.dart';
+import 'package:quizix/data/database/user_service.dart';
+import 'package:quizix/data/list_data.dart';
+import 'package:quizix/data/provider/data_provider.dart';
+import 'package:quizix/data/provider/history_provider.dart';
+import 'package:quizix/data/provider/user_provider.dart';
+import 'package:quizix/data/user_preferences.dart';
 import 'package:quizix/models/detail_history_model.dart';
 import 'package:quizix/models/history_model.dart';
 import 'package:quizix/models/question_model.dart';
-import 'package:quizix/services/screen_service.dart';
+import 'package:quizix/utils/alert.dart';
 import 'package:quizix/utils/app_colors.dart';
 import 'package:quizix/utils/app_images.dart';
 import 'package:quizix/widgets/answer_item.dart';
@@ -80,25 +86,32 @@ class _QuestionScreenState extends State<QuestionScreen> {
       }
     }
     final score = correct * 10;
-    final userProvider = context.read<UserProvider>();
-    await userProvider.addPoint(score);
-    await userProvider.addProgressDaily(1);
-    final newHistory = HistoryModel(lesson: widget.lesson, level: widget.level, point: score);
-    final historyId = await userProvider.addHistory(newHistory);
+    context.read<HistoryProvider>().loadAllHistory();
+    final userId = await UserPreferences.getIdUser();
+    final historyId = await HistoryService.insertHistory(HistoryModel(lesson: widget.lesson, level: widget.level, point: score, userId: userId!));
+    await UserPreferences.setProgressDaily(1);
     for(int i=0; i<_question.length; i++){
       final q = _question[i];
       final userAnswer = _answer[i];
       final isCorrect = userAnswer == q.correctIndex ? 1 : 0;
       final answerText = userAnswer != null ? q.options[userAnswer] : '';
-      await insertDetailHistory(DetailHistoryModel(
+      await DetailHistoryService.insertDetailHistory(
+        DetailHistoryModel(
           historyId: historyId,
           question: q.question,
           answer: answerText,
-          isCorrect: isCorrect)
+          isCorrect: isCorrect
+        )
       );
     }
-
+    final insertPoint = await UserService.updatePointUser(score);
+    if(insertPoint == false){
+      debugPrint('Gagal memasukan point');
+      return;
+    }
     if (!mounted) return;
+    context.read<UserProvider>().loadPoint();
+    context.read<DataProvider>().loadProgressDaily();
     context.go('/result', extra: {
       'correct': correct,
       'wrong': wrong,
@@ -107,9 +120,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
     });
   }
 
-
   // FUNCTION WAKTU
-  void _startTimer() async {
+  Future<void> _startTimer() async {
     timeProgress = 0;
     for (int i = 0; i <= maxTime; i++) {
       if(!_isActive) return;

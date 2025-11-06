@@ -32,6 +32,7 @@ class DbHelper {
     await db.execute('''
       CREATE TABLE history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id int,
         lesson TEXT,
         level TEXT,
         point INTEGER
@@ -48,5 +49,17 @@ class DbHelper {
       )
     ''');
 
+    await db.execute('''
+      CREATE TABLE user (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT,
+        password TEXT,
+        name TEXT,
+        gender TEXT,
+        point int,
+        rank TEXT,
+        profile TEXT
+      )
+    ''');
   }
 }

@@ -2,9 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:quizix/data/user_provider.dart';
+import 'package:quizix/data/provider/data_provider.dart';
+import 'package:quizix/data/provider/history_provider.dart';
+import 'package:quizix/data/provider/user_provider.dart';
+import 'package:quizix/data/user_preferences.dart';
 import 'package:quizix/screens/layout/layout_screen.dart';
+import 'package:quizix/utils/alert.dart';
 import 'package:quizix/utils/app_colors.dart';
+import 'package:quizix/utils/app_images.dart';
 import 'package:quizix/widgets/rank_label.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -12,8 +17,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName = context.watch<UserProvider>().name;
-    final point = context.watch<UserProvider>().point;
     return LayoutScreen(
       nameScreen: 'profile',
       color: AppColors.white,
@@ -41,8 +44,9 @@ class ProfileScreen extends StatelessWidget {
                       color: Colors.white.withValues(alpha: .5),
                       shape: BoxShape.circle,
                     ),
-                    child: Selector<UserProvider, String>(builder: (_, value, _){
-                      return ClipOval(child: Image.asset(value, width: 80, height: 80,),);
+                    child: Selector<UserProvider, String>(
+                        builder: (_, value, _){
+                          return ClipOval(child: Image.asset(value, width: 80, height: 80,),);
                     }, selector: (_, prov)=> prov.profile),
                   ),
                   TextButton(onPressed: ()=>context.push('/edit-photo'), child: Text("edit".tr(), style: TextStyle(
@@ -58,10 +62,29 @@ class ProfileScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  buildInfoProfile(context, 'name', userName, '/edit-name', null),
-                  buildRankInfo(context,point)
+                  buildInfoProfile(context, 'name', '/edit-name', Icons.edit),
+                  buildInfoProfile(context, 'email', '', null),
+                  buildInfoProfile(context, 'password', '/edit-password', Icons.edit),
+                  buildRankInfo(context),
+                  const SizedBox(height: 20,),
+                  ElevatedButton(
+                    onPressed: (){
+                      showPopUpInfo(context: context, title: 'are_you_sure_to_logout', btn1: 'cancel', btn2: 'yes', image: AppImages.sure, onClick: ()async{
+                        await UserPreferences.deleteUserStorage();
+                        if(!context.mounted) return;
+                        context.read<UserProvider>().loadAllData();
+                        context.read<HistoryProvider>().loadAllHistory();
+                        context.read<DataProvider>().loadAll();
+                        context.go('/splash');
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.redAccent
+                    ),
+                    child: Text('logout'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
+                  )
                 ],
               )
             )
@@ -72,9 +95,9 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget buildInfoProfile(BuildContext context, String label, String value, String route, IconData? icon){
+  Widget buildInfoProfile(BuildContext context, String label,String route, IconData? icon){
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -86,20 +109,37 @@ class ProfileScreen extends StatelessWidget {
                 color: AppColors.lightBlue,
                 fontWeight: FontWeight.w700,
               ),),
-              Text(value, style: TextStyle(
-                  color: AppColors.lightBlue,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22
-              ),)
+              Selector<UserProvider, String>(
+                selector: (_, prov){
+                  switch(label){
+                    case 'name':
+                      return prov.name;
+                    case 'email':
+                      return prov.email;
+                    case 'point':
+                      return prov.point.toString();
+                    default:
+                      return label;
+                  }
+                },
+                builder: (_, buildValue, _){
+                  return Text(label=='password'? '*******':buildValue, style: TextStyle(
+                      color: AppColors.lightBlue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22
+                  ),);
+                },
+              )
             ],
           ),
-          IconButton(onPressed: ()=>context.push(route), icon: Icon(icon ?? Icons.edit, size: 25, color: AppColors.lightBlue,))
+          if(icon != null)
+            IconButton(onPressed: ()=>context.push(route), icon: Icon(icon, size: 25, color: AppColors.lightBlue,))
         ],
       ),
     );
   }
 
-  Widget buildRankInfo(BuildContext context, int point){
+  Widget buildRankInfo(BuildContext context){
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
@@ -126,11 +166,13 @@ class ProfileScreen extends StatelessWidget {
             child: Row(
               children: [
                 Icon(Icons.local_fire_department_rounded, size: 25, color: Colors.deepOrange,),
-                Text(point.toString(), style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.orange,
-                  fontSize: 18
-                ),)
+                Selector<UserProvider, int>(
+                  builder: (_, value, _)=>Text(value.toString(), style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.orange,
+                      fontSize: 18
+                  ),),
+                  selector: (_, prov)=>prov.point)
               ],
             ),
           )

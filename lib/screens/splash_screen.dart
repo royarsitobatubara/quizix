@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:quizix/data/user_storage.dart';
+import 'package:provider/provider.dart';
+import 'package:quizix/data/provider/user_provider.dart';
+import 'package:quizix/data/user_preferences.dart';
 import 'package:quizix/utils/app_colors.dart';
 import 'package:quizix/utils/app_images.dart';
 
@@ -14,11 +16,24 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> getStarted() async {
-    await UserStorage.checkDailyReset();
-    await Future.delayed(Duration(milliseconds: 3000));
-    if(!mounted) return;
+    // await DbHelper.deleteDatabase();
+    // await UserPreferences.deleteUserStorage();
+    final isLogin = await UserPreferences.getDataLogin();
+    final userId = await UserPreferences.getIdUser();
+    await UserPreferences.checkDailyReset();
+    await Future.delayed(const Duration(seconds: 3));
+    if(isLogin == false || userId == null){
+      debugPrint('isLogin: $isLogin, userId: $userId');
+      if (!mounted) return;
+      context.go('/login');
+      return;
+    }
+    if (!mounted) return;
+    debugPrint('isLogin: $isLogin, userId: $userId');
+    context.read<UserProvider>().loadAllData();
     context.go('/home');
   }
+
 
   @override
   void initState() {

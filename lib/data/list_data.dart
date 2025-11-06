@@ -1,5 +1,13 @@
 import 'package:quizix/models/list_model.dart';
 import 'package:quizix/utils/app_images.dart';
+import 'package:quizix/data/question/biology.dart';
+import 'package:quizix/data/question/chemistry.dart';
+import 'package:quizix/data/question/history.dart';
+import 'package:quizix/data/question/informatics.dart';
+import 'package:quizix/data/question/physics.dart';
+import 'package:quizix/data/question/mathematics.dart';
+import 'package:quizix/data/question/science.dart';
+import 'package:quizix/models/question_model.dart';
 
 // LIST BOOKMARK SCREEN
 final List<ListModel> allQuestion = [
@@ -35,12 +43,26 @@ final List<ListModel> allQuestion = [
   ),
   ListModel(
       image: AppImages.science,
-      title: 'Science',
+      title: 'science',
       route: '/question/science'
   ),
 ];
 
+List<QuestionModel> getQuestion(String category, String level) {
+  final categoryMap = {
+    "informatics": informaticsQuestion,
+    "biology": biologyQuestion,
+    "physics": physicsQuestion,
+    "mathematics": mathematicsQuestion,
+    "chemistry": chemistryQuestion,
+    "history": historyQuestion,
+    "science": scienceQuestion
+  };
+  final selectedCategory = categoryMap[category];
+  if (selectedCategory == null) return [];
 
+  return selectedCategory[level] ?? [];
+}
 
 // LIST HOME SCREEN
 final List<ListModel> allQuestionPrimary = [

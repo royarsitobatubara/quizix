@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:quizix/data/database/db_service.dart';
+import 'package:quizix/data/database/detail_history_service.dart';
 import 'package:quizix/models/detail_history_model.dart';
 import 'package:quizix/screens/layout/layout_screen.dart';
 
@@ -25,7 +25,7 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
   
   Future<void> getData() async {
     try{
-      final data = await getAllDetailHistory(historyId: int.parse(widget.historyId));
+      final data = await DetailHistoryService.getAllDetailHistory(historyId: int.parse(widget.historyId));
       setState(() {
         _data = data;
       });

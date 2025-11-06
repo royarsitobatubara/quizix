@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:quizix/data/list_data.dart';
-import 'package:quizix/data/user_provider.dart';
+import 'package:quizix/data/provider/user_provider.dart';
+import 'package:quizix/utils/app_images.dart';
 import 'package:quizix/widgets/info_daily_task.dart';
 import 'package:quizix/widgets/game_item.dart';
 import 'package:quizix/widgets/question_item.dart';
@@ -14,7 +15,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName = context.watch<UserProvider>().name;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10),
       child: Column(
@@ -25,28 +25,33 @@ class HomeScreen extends StatelessWidget {
             onTap: ()=>context.push('/profile'),
             child: ListTile(
               leading: Selector<UserProvider, String>(
-            selector: (_, prov)=> prov.profile,
-            builder: (_, value, __){
-              return ClipOval(
-                child: SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: Image.asset(
-                    value,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              );
-            },
+                selector: (_, prov)=> prov.profile,
+                builder: (_, value, __){
+                  return ClipOval(
+                    child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: Image.asset(
+                        value.isEmpty ? AppImages.defaultProfile : value,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                );
+              },
             ),
 
-              title: Text(
-                userName,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+              title: Selector<UserProvider, String>(
+                selector: (_, prov)=> prov.name,
+                builder: (_, value, __){
+                  return Text(
+                    value,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  );
+                },
               ),
               subtitle: Align(
                 alignment: Alignment.centerLeft,

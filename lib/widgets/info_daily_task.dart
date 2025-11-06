@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quizix/data/user_provider.dart';
+import 'package:quizix/data/provider/data_provider.dart';
 import 'package:quizix/utils/app_colors.dart';
 import 'package:quizix/utils/app_images.dart';
 import 'package:quizix/widgets/progress_bar.dart';
@@ -11,7 +11,7 @@ class InfoDailyTask extends StatelessWidget {
   const InfoDailyTask({super.key});
   @override
   Widget build(BuildContext context) {
-    final progress = context.watch<UserProvider>().progressDaily;
+    final progress = context.read<DataProvider>().progressDaily;
     return Container(
       width: double.infinity,
       height: 150,

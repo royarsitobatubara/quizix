@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quizix/data/user_provider.dart';
+import 'package:quizix/data/provider/history_provider.dart';
+import 'package:quizix/models/history_model.dart';
 import 'package:quizix/widgets/history_item.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -19,7 +20,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UserProvider>().loadHistory();
+      context.read<HistoryProvider>().loadAllHistory();
     });
   }
 
@@ -60,10 +61,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
           const SizedBox(height: 10,),
           Expanded(
-            child: Consumer<UserProvider>(
-              builder: (context, userProvider, _) {
-                final historyList = userProvider.history.reversed.toList();
-                if(historyList.isEmpty){
+            child: Selector<HistoryProvider, List<HistoryModel>>(
+              selector: (_, prov)=>prov.historyList,
+              builder: (context, value, _) {
+                if(value.isEmpty){
                   return Center(
                     child: Text('no_history'.tr(), style: const TextStyle(
                       color: Colors.white,
@@ -73,9 +74,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   );
                 }
                 return ListView.builder(
-                  itemCount: historyList.length,
+                  itemCount: value.length,
                   itemBuilder: (context, index) {
-                    return HistoryItem(history: historyList[index]);
+                    return HistoryItem(history: value[index]);
                   },
                 );
               },

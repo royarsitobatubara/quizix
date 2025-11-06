@@ -3,11 +3,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:quizix/data/user_provider.dart';
+import 'package:quizix/data/database/db_helper.dart';
+import 'package:quizix/data/database/user_service.dart';
+import 'package:quizix/data/provider/data_provider.dart';
+import 'package:quizix/data/provider/history_provider.dart';
+import 'package:quizix/data/provider/user_provider.dart';
+import 'package:quizix/data/user_preferences.dart';
 import 'package:quizix/screens/layout/layout_screen.dart';
 import 'package:quizix/services/audio_manager.dart';
-import 'package:quizix/services/screen_service.dart';
+import 'package:quizix/utils/alert.dart';
 import 'package:quizix/utils/app_colors.dart';
+import 'package:quizix/utils/app_images.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -22,6 +28,54 @@ class _SettingScreenState extends State<SettingScreen> {
 
   void toggleEffect() => setState(() => effectMusic = !effectMusic);
 
+  Future<void> deleteDataHandle(BuildContext context) async {
+    try{
+      showPopUpInfo(
+          context: context,
+          title: 'are_you_sure_you_want_to_delete_all_application_data',
+          btn1: 'cancel',
+          btn2: 'yes',
+          image: AppImages.sure,
+          onClick: () async {
+            await UserPreferences.deleteUserStorage();
+            await DbHelper.deleteDatabase();
+            if(!context.mounted) return;
+            context.read<UserProvider>().loadAllData();
+            context.read<HistoryProvider>().loadAllHistory();
+            context.pop();
+            context.go('/splash');
+          }
+      );
+      debugPrint('Success delete all data');
+    }catch(e){
+      debugPrint('Failed delete data: $e');
+    }
+  }
+
+  Future<void> deleteAccountHandle(BuildContext context) async {
+    try{
+      showPopUpInfo(
+          context: context,
+          title: 'are_you_sure_you_want_to_delete_this_account',
+          btn1: 'cancel',
+          btn2: 'yes',
+          image: AppImages.sure,
+          onClick: () async {
+            await UserService.deleteUserById();
+            await UserPreferences.deleteUserStorage();
+            if(!context.mounted) return;
+            context.read<UserProvider>().loadAllData();
+            context.read<HistoryProvider>().loadAllHistory();
+            context.pop();
+            context.go('/splash');
+          }
+      );
+      debugPrint('Success delete all data');
+    }catch(e){
+      debugPrint('Failed delete data: $e');
+    }
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -31,7 +85,7 @@ class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
 
-    final userProvider = Provider.of<UserProvider>(context);
+    final dataProvider = Provider.of<DataProvider>(context);
 
     return LayoutScreen(
         nameScreen: 'settings',
@@ -47,6 +101,10 @@ class _SettingScreenState extends State<SettingScreen> {
                   buildMenuItem(context, '/edit-photo', 'edit_photo'),
                   const SizedBox(height: 8),
                   buildMenuItem(context, '/edit-name', 'edit_name'),
+                  const SizedBox(height: 8),
+                  buildMenuItem(context, '/edit-password', 'edit_password'),
+                  const SizedBox(height: 8),
+                  buildMenuItem(context, '/list-account', 'swap_account'),
                 ],
               ),
 
@@ -55,9 +113,11 @@ class _SettingScreenState extends State<SettingScreen> {
                 icon: Icons.volume_up_outlined,
                 title: "sounds".tr(),
                 children: [
-                  buildSwitchItem("music", userProvider.backSound, (){
-                    final newValue = !userProvider.backSound;
-                    userProvider.updateBackSound(newValue);
+                  buildSwitchItem("music", dataProvider.backSound, ()async{
+                    final newValue = !dataProvider.backSound;
+                    await UserPreferences.setDataBool(key: 'backSound', value: newValue);
+                    if(!context.mounted)return;
+                    context.read<DataProvider>().loadBackSound();
                     if (newValue) {
                       AudioManager().playBackSound();
                     } else {
@@ -146,6 +206,18 @@ class _SettingScreenState extends State<SettingScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('delete_data'.tr(),
+                            style:
+                            const TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
+                        const Icon(Icons.delete, size: 16,),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: ()async => await deleteAccountHandle(context),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('delete_account'.tr(),
                             style:
                             const TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
                         const Icon(Icons.delete, size: 16,),

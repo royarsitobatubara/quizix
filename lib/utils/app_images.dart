@@ -2,7 +2,6 @@ class AppImages {
   static final String _baseUrl = 'assets/images';
 
   static final String logo1 = '$_baseUrl/logo_1.webp';
-  static final String defaultProfile = '$_baseUrl/guest.webp';
   static final String anchor = '$_baseUrl/anchor.webp';
   static final String timer = '$_baseUrl/time.webp';
   static final String sure = '$_baseUrl/sure.webp';
@@ -22,6 +21,7 @@ class AppImages {
   static final String science = '$_baseUrl/lesson/science.webp';
 
   // PROFILE
+  static final String defaultProfile = '$_baseUrl/guest.webp';
   static final String profile1 = '$_baseUrl/profile/1.webp';
   static final String profile2 = '$_baseUrl/profile/2.webp';
   static final String profile3 = '$_baseUrl/profile/3.webp';

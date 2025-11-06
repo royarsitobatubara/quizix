@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UserStorage {
+class UserPreferences {
   static const String _langKey = "language";
 
   static Future<void> deleteUserStorage() async {
@@ -11,6 +11,29 @@ class UserStorage {
       debugPrint('Success delete data user storage');
     }catch(e){
       debugPrint('Failed delete user storage: $e');
+    }
+  }
+
+  static Future<int?> getIdUser() async {
+    try{
+      final prefs = await SharedPreferences.getInstance();
+      final id = prefs.getInt('userId');
+      if (id != null){
+        return id;
+      }
+      return null;
+    }catch(e){
+      debugPrint('Terjadi kesalahan pada getIdUser: $e');
+      return null;
+    }
+  }
+
+  static Future<void> setIdUser(int id) async {
+    try{
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('userId', id);
+    }catch(e){
+      debugPrint('Terjadi kesalahan pada setIdUser: $e');
     }
   }
 
@@ -51,6 +74,17 @@ class UserStorage {
     return prefs.getBool(key) ?? true;
   }
 
+  static Future<void> setDataLogin({
+    required bool value,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLogin', value);
+  }
+  // GET
+  static Future<bool> getDataLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLogin') ?? false;
+  }
 
 
   // SERVICE FOR LANGUAGE
@@ -65,18 +99,6 @@ class UserStorage {
     await prefs.setString(_langKey, langCode);
   }
 
-  // FUNGSI AMBIL POINT
-  static Future<int> getPoint() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('point') ?? 0;
-  }
-
-  // FUNGSI TAMBAH POINT
-  static Future<void> addPoint(int point) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('point', point);
-  }
-
   // SERVICE FOR PROGRESS DAILY
   // GET
   static Future<int> getProgressDaily() async {
@@ -86,7 +108,9 @@ class UserStorage {
   // SET
   static Future<void> setProgressDaily(int progress) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('progressDaily', progress);
+    final progressOld = await getProgressDaily();
+    final newProgress = progressOld + progress;
+    await prefs.setInt('progressDaily', newProgress);
   }
 
   // SERVICE FOR DAILY
@@ -106,6 +130,5 @@ class UserStorage {
       await prefs.setString('lastResetDate', todayString);
     }
   }
-
 
 }

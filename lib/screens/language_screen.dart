@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:quizix/data/user_storage.dart';
+import 'package:quizix/data/user_preferences.dart';
 import 'package:quizix/screens/layout/layout_screen.dart';
 import 'package:quizix/utils/app_colors.dart';
 
@@ -22,7 +22,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
   }
 
   Future<void> initLang() async {
-    String savedLang = await UserStorage.getLanguage();
+    String savedLang = await UserPreferences.getLanguage();
     setState(() {
       currentLang = savedLang.isEmpty ? "en" : savedLang;
     });
@@ -36,7 +36,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
       context.setLocale(Locale(lang.toLowerCase()));
     });
 
-    await UserStorage.saveLanguage(lang.toLowerCase());
+    await UserPreferences.saveLanguage(lang.toLowerCase());
   }
 
   @override

@@ -2,8 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:quizix/data/user_provider.dart';
-import 'package:quizix/data/user_storage.dart';
+import 'package:quizix/data/database/user_service.dart';
+import 'package:quizix/data/provider/user_provider.dart';
 import 'package:quizix/screens/layout/layout_screen.dart';
 import 'package:quizix/utils/app_images.dart';
 
@@ -19,10 +19,11 @@ class _EditPictureScreenState extends State<EditPictureScreen> {
 
   Future<void> _editPhotoHandle() async {
     try {
-      await UserStorage.setDataString(
-          key: 'profile',
-          value: AppImages.listProfile[_currentIndex!]
-      );
+      if(_currentIndex == null){
+        debugPrint("Pilih foto dulu, manusia!");
+        return;
+      }
+      await UserService.updateProfileUser(AppImages.listProfile[_currentIndex!]);
       if(!mounted) return;
       context.read<UserProvider>().loadProfile();
       context.pop();
