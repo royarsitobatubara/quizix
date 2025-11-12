@@ -47,12 +47,14 @@ class _SettingScreenState extends State<SettingScreen> with TickerProviderStateM
 
     // Create staggered animations for each card
     _cardAnimations = List.generate(5, (index) {
+      final start = index * 0.12;
+      final end = (start + 0.5).clamp(0.0, 1.0);
       return Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(
           parent: _fadeController,
           curve: Interval(
-            index * 0.15,
-            0.5 + (index * 0.15),
+            start,
+            end,
             curve: Curves.easeOutCubic,
           ),
         ),
@@ -60,6 +62,8 @@ class _SettingScreenState extends State<SettingScreen> with TickerProviderStateM
     });
 
     _slideAnimations = List.generate(5, (index) {
+      final start = index * 0.12;
+      final end = (start + 0.5).clamp(0.0, 1.0);
       return Tween<Offset>(
         begin: const Offset(0.3, 0),
         end: Offset.zero,
@@ -67,8 +71,8 @@ class _SettingScreenState extends State<SettingScreen> with TickerProviderStateM
         CurvedAnimation(
           parent: _slideController,
           curve: Interval(
-            index * 0.15,
-            0.5 + (index * 0.15),
+            start,
+            end,
             curve: Curves.easeOutCubic,
           ),
         ),
